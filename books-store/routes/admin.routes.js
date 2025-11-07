@@ -125,14 +125,24 @@ adminRouter.get(
 adminRouter.get("/lease-status", getAllStatus);
 adminRouter.get("/user-lease/:id", getSingleUserInvoice);
 
+// adminRouter.put(
+//   "/book/returned/:invoice_no",
+//   [
+//     param("invoice_no").notEmpty().withMessage("provide invoice id"),
+//   ],
+//   RETURNED
+// );
+
 adminRouter.put(
   "/book/returned/:invoice_no",
   [
-    // body('userId').isInt().withMessage("Please provide user_id"),
-    body("invoice_no").isInt().withMessage("Please provide invoice_no"),
-    // body('items').isInt().withMessage("Please provide items"),
+    param("invoice_no")
+      .notEmpty()
+      .withMessage("Please provide an invoice number"),
   ],
   RETURNED
 );
+
+//body("items").isArray().withMessage("Please provide a items"),
 
 module.exports = adminRouter;

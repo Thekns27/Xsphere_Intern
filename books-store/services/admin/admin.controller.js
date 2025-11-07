@@ -1,6 +1,6 @@
 const { json } = require("express");
 const database = require("../../database");
-const { validationResult, query } = require("express-validator");
+const { validationResult,query } = require("express-validator");
 
 /**
  * @param {import('express').Request} req
@@ -299,7 +299,6 @@ const updateBook = async (req, res) => {
     await database.disconnectDatabase();
   }
 };
-
 /**
  * @param {import('express').Request} req
  * @param {import('express').Response} res
@@ -350,7 +349,6 @@ const insertInStock = async (req, res) => {
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
-
 const lease = async (req, res) => {
   const client = await database.connectDatabase();
   try {
@@ -568,153 +566,33 @@ SET lease_stock = $1, available_stock = $2 WHERE "bookId" = $3;`,
     await database.disconnectDatabase();
   }
 };
+
 /**
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
-
-
-// const RETURNED = async (req, res) => {
-//   const client = await database.connectDatabase();
-
-//   try {
-//     const invoice_no = req.params.invoice_no;
-//     //const { items } = req.body;
-//     console.log(invoice_no);
-//     // const { invoice_no } = req.body;
-//     // console.log(invoice_no);
-//     const return_invoice = await client.query(
-//       `SELECT * FROM lease_invoice WHERE invoice_no = $1`,
-//       [invoice_no]
-//     );
-//     if (return_invoice.rows.length === 0) {
-//       return res.status(404).json({ message: "This invoice not found!" });
-//     }
-
-//     const invoice = return_invoice.rows[0];
-
-//     const bookIds = items.map((item) => item.book_id);
-//     const placeholders = bookIds.map((_, i) => `$${i + 1}`).join(",");
-
-//     const return_invoice_items = await client.query(
-//       `SELECT * FROM lease_invoice_items WHERE invoice_id = $1 AND book_id IN (${placeholders})`,
-//       [invoice.id, ...bookIds]
-//     );
-
-//     let errorMessages = [];
-//     for (let i = 0; i < items.length; i++) {
-//       const element = items[i];
-//       const returnItem = return_invoice_items.rows.find(
-//         (item) => item.book_id === element.book_id
-//       );
-//       if (!returnItem) {
-//         errorMessages.push(
-//           `Book id ${element.book_id} not found in this invoice`
-//         );
-//       } else if (element.quantity > returnItem.quantity) {
-//         errorMessages.push(
-//           `Return quantity for book ${element.book_id} exceeds borrowed amount`
-//         );
-//       }
-//     }
-
-//     if (errorMessages.length > 0) {
-//       return res.status(400).json({ message: errorMessages });
-//     }
-
-//     for (let i = 0; i < items.length; i++) {
-//       const element = items[i];
-//       await client.query(
-//         `UPDATE book_instock
-//          SET available_stock = available_stock + $1,
-//              lease_stock = lease_stock - $1
-//          WHERE "bookId" = $2`,
-//         [element.quantity, element.book_id]
-//       );
-//     }
-
-//     await client.query(
-//       `UPDATE lease_invoice SET status = 'returned', returned_at = NOW() WHERE id = $1`,
-//       [invoice.id]
-//     );
-
-//     const details = await client.query(
-//       `SELECT
-//         lease_invoice.id AS invoice_id,
-//         lease_invoice.invoice_no,
-//         lease_invoice.status,
-//         lease_invoice.created_at,
-//         lease_invoice.due_date,
-//         lease_invoice.total_price AS invoice_total,
-//         lease_invoice.returned_at,
-//         users.id AS user_id,
-//         users.name,
-//         users.email,
-//         users.gender,
-//         lease_invoice_items.book_id,
-//         lease_invoice_items.quantity,
-//         lease_invoice_items.total_price AS item_total,
-//         books.title AS book_title,
-//         books."authorId",
-//         books.description,
-//         book_instock.stock,
-//         book_instock.available_stock,
-//         book_instock.lease_stock
-//       FROM lease_invoice
-//       LEFT JOIN users ON lease_invoice.user_id = users.id
-//       LEFT JOIN lease_invoice_items ON lease_invoice.id = lease_invoice_items.invoice_id
-//       LEFT JOIN books ON lease_invoice_items.book_id = books.id
-//       LEFT JOIN book_instock ON books.id = book_instock."bookId"
-//       WHERE lease_invoice.invoice_no = $1`,
-//       [invoice_no]
-//     );
-
-//     const data = details.rows;
-//     const result = {
-//       invoice_id: data[0].invoice_id,
-//       invoice_no: data[0].invoice_no,
-//       status: data[0].status,
-//       borrow_date: data[0].created_at,
-//       due_date: data[0].due_date,
-//       returned_at: data[0].returned_at,
-//       totalPrice: data[0].invoice_total,
-//       user: {
-//         id: data[0].user_id,
-//         name: data[0].name,
-//         email: data[0].email,
-//         gender: data[0].gender,
-//         books: [],
-//       },
-//     };
-
-//     data.forEach((element) => {
-//       const book = {
-//         book_id: element.book_id,
-//         title: element.book_title,
-//         author_id: element.authorid,
-//         description: element.description,
-//         quantity: element.quantity,
-//         per_price: element.item_total,
-//         stockManagement: {
-//           stock: element.stock,
-//           available_stock: element.available_stock,
-//           lease_stock: element.lease_stock,
-//         },
-//       };
-//       result.user.books.push(book);
-//     });
-
-//     res.json(return_invoice.rows[0]);
-//   } catch (err) {
-//     if (err.code === "42P01") {
-//       res.status(400).json({ message: "table does not exist!" });
-//     } else {
-//       res.status(500).json({ message: "internal server error! " + err });
-//     }
-//   } finally {
-//     await database.disconnectDatabase();
-//   }
-// };
+const getAllStatus = async (req, res) => {
+  const client = await database.connectDatabase();
+    try {
+      //const leaseInvoice = await client.query(`SELECT * FROM lease_invoice order by id desc`);
+      const today = new Date();
+    const leaseInvoice = await client.query(`SELECT * FROM lease_invoice order by id desc`);
+    if (leaseInvoice.rows[0].due_date < today) {
+      const leaseInvoiceUpdate = await client.query(
+        `UPDATE lease_invoice SET status = 'OVER_DUE' RETURNING *`
+      );
+      res.json(leaseInvoiceUpdate.rows);
+    }
+      res.json(leaseInvoice.rows);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: "internal server error!",
+      });
+    } finally {
+      await database.disconnectDatabase();
+    }
+};
 
 const getSingleStatus = async (req, res) => {
   const client = await database.connectDatabase();
@@ -771,37 +649,26 @@ const getSingleStatus = async (req, res) => {
   }
 };
 
-const getAllStatus = async (req, res) => {
-  const client = await database.connectDatabase();
-
-  try {
-    const today = new Date();
-    const leaseInvoice = await client.query(
-      `UPDATE lease_invoice SET status = 'OVER_DUE' WHERE due_date < $1 RETURNING *`,
-      [today]
-    );
-    res.json(leaseInvoice.rows);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "internal server error!",
-    });
-  } finally {
-    await database.disconnectDatabase();
-  }
-};
-
-const getSingleUserInvoice = async (req, res) => {
-  const client = await database.connectDatabase();
+ const getSingleUserInvoice = async (req, res) => {
+    const client = await database.connectDatabase();
   try {
     const id = parseInt(req.params.id);
     const singleUserLease = await client.query(
-      `SELECT li.id AS lease_invoice_id , li.invoice_no, li.user_id,li.total_price AS invoice_total_price, li.due_price,li.created_at AS borrowed_at,li.due_date, li.status, users.email, users.name AS user_name, items.id AS item_id , items.book_id, items.quantity, items.total_price AS items_total_price , bo.title, bo.description, bo."authorId" AS author_id, bo."createdAt" AS book_created_at , at.name AS author_name FROM lease_invoice as li JOIN users ON users.id = li.user_id LEFT JOIN lease_invoice_items as items ON li.id= items.invoice_id LEFT JOIN books as bo ON bo.id = items.book_id LEFT JOIN authors as at ON at.id = bo."authorId"
+      `SELECT li.id AS lease_invoice_id ,li.invoice_no, li.user_id,li.total_price
+      AS invoice_total_price, li.due_price,li.created_at
+      AS borrowed_at,li.due_date, li.status, users.email, users.name
+      AS user_name, items.id AS item_id , items.book_id, items.quantity, items.total_price
+      AS items_total_price , bo.title, bo.description, bo."authorId"
+      AS author_id, bo."createdAt" AS book_created_at , at.name
+      AS author_name FROM lease_invoice as li
+      JOIN users ON users.id = li.user_id
+      LEFT JOIN lease_invoice_items as items ON li.id= items.invoice_id
+      LEFT JOIN books as bo ON bo.id = items.book_id
+      LEFT JOIN authors as at ON at.id = bo."authorId"
        WHERE li.user_id = $1`,
       [id]
     );
     const data = singleUserLease.rows;
-
     const user = {
       id: data[0].user_id,
       name: data[0].user_name,
@@ -839,28 +706,75 @@ const getSingleUserInvoice = async (req, res) => {
         }),
       });
     }
-
     return res.json({
       user: user,
       lease_history: result,
     });
-
-    console.log(result);
-    res.json(result);
-    // res.json(singleUserLease.rows);
   } catch (err) {
     console.log(err);
   } finally {
     await database.disconnectDatabase();
   }
 };
-
 const RETURNED = async (req, res) => {
   const client = await database.connectDatabase();
+
   try {
-    const id = req.params.id;
+    const invoice_no = req.params.invoice_no;
+
+    const invoiceResult = await client.query(
+      `SELECT * FROM lease_invoice WHERE invoice_no = $1`,
+      [invoice_no]
+    );
+
+    if (invoiceResult.rows.length === 0) {
+      return res.status(404).json({ message: "This invoice not found!" });
+    }
+
+    const invoice = invoiceResult.rows[0];
+    if (invoice.status === "RETURNED" || invoice.status === "OVERDUE") {
+      return res
+        .status(400)
+        .json({ message: `Invoice already marked as ${invoice.status}` });
+    }
+    const itemsResult = await client.query(
+      `SELECT * FROM lease_invoice_items WHERE invoice_id = $1`,
+      [invoice.id]
+    );
+    const items = itemsResult.rows;
+
+    if (items.length === 0) {
+      return res.status(400).json({ message: "No items found in this invoice!" });
+    }
+
+    const today = new Date();
+    const dueDate = new Date(invoice.due_date);
+    const status = today > dueDate ? "OVER_DUE" : "RETURNED";
+
+    for (let item of items) {
+      await client.query(
+        `UPDATE "book_instock"
+         SET
+           available_stock = available_stock + $1,
+           lease_stock = lease_stock - $1,
+           "updatedAt" = NOW()
+         WHERE "bookId" = $2`,
+        [item.quantity, item.book_id]
+      );
+    }
+    await client.query(
+      `UPDATE lease_invoice
+       SET status = $1, updated_at = NOW()
+       WHERE id = $2`,
+      [status, invoice.id]
+    );
+
+    res.status(200).json({
+      message: `Books returned successfully! Invoice marked as ${status}.`,
+    });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).json({ message: "Internal server error!" });
   } finally {
     await database.disconnectDatabase();
   }
