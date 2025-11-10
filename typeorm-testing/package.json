@@ -1,12 +1,25 @@
 {
   "name": "typeorm-testing",
   "version": "1.0.0",
-  "main": "ormconfig.js",
+  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migration:generate": "typeorm migration:generate ./src/migrations/migration -p -o --esm -d ./ormconfig.js",
+    "migration:run": "typeorm migration:run -d ./ormconfig.js",
+    "migration:revert": "typeorm migration:revert -d ./ormconfig.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "node-pg-migrate": "^8.0.3",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.27"
+  }
 }
