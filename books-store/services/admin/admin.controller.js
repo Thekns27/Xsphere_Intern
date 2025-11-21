@@ -64,6 +64,7 @@ const getAllAuthors = async (req, res) => {
     await database.disconnectDatabase();
   }
 };
+
 /**
  * @param {import('express').Request} req
  * @param {import('express').Response} res
@@ -93,6 +94,7 @@ const getSingleAuthor = async (req, res) => {
     await database.disconnectDatabase();
   }
 };
+
 /**
  * @param {import('express').Request} req
  * @param {import('express').Response} res
@@ -299,6 +301,7 @@ const updateBook = async (req, res) => {
     await database.disconnectDatabase();
   }
 };
+
 /**
  * @param {import('express').Request} req
  * @param {import('express').Response} res
